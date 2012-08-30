@@ -229,8 +229,8 @@ class Envelope(ParameterCollection):
         self.velocity_attack_control = Parameter(0, 63)
         self.keyboard_decay_scaling = Parameter(0, 63)
 
-    def to_bytearray(self):
-        """Pack the class's attributes into a bytearray."""
+    def serialize(self):
+        """Serialize the class's attributes into a bytearray."""
         bytes = bytearray()
 
         for level in self.levels:
@@ -245,8 +245,8 @@ class Envelope(ParameterCollection):
 
         return bytes
 
-    def from_bytearray(self, bytes):
-        """Unpack the bytearray into the class's attributes."""
+    def deserialize(self, bytes):
+        """Deserialize the bytearray into the class's attributes."""
         for level in self.levels:
             level.value = pcb_to_display(bytes.next() >> 1)
 
@@ -298,8 +298,8 @@ class LFO(ParameterCollection):
         self.delay = Parameter(0, 63)
         self.modulation_source = ModulationSource()
 
-    def to_bytearray(self):
-        """Pack the class's attributes into a bytearray."""
+    def serialize(self):
+        """Serialize the class's attributes into a bytearray."""
         bytes = bytearray()
 
         waveform = (self.waveform.value & 0b00000011) << 6
@@ -315,8 +315,8 @@ class LFO(ParameterCollection):
 
         return bytes
 
-    def from_bytearray(self, bytes):
-        """Unpack the bytearray into the class's attributes."""
+    def deserialize(self, bytes):
+        """Deserialize the bytearray into the class's attributes."""
         byte = bytes.next()
 
         self.waveform.value = (byte & 0b11000000) >> 6
@@ -426,8 +426,8 @@ class Oscillator(ParameterCollection):
         """Set the semitone value using an octave value (-3 to 5)."""
         self.semitone.value = (value + 3) * 12
 
-    def to_bytearray(self):
-        """Pack the class's attributes into a bytearray."""
+    def serialize(self):
+        """Serialize the class's attributes into a bytearray."""
         bytes = bytearray()
 
         fine_tune = self.fine_tune.value << 3
@@ -466,8 +466,8 @@ class Oscillator(ParameterCollection):
 
         return bytes
 
-    def from_bytearray(self, bytes):
-        """Unpack the bytearray into the class's attributes."""
+    def deserialize(self, bytes):
+        """Deserialize the bytearray into the class's attributes."""
         self.semitone.value = bytes.next()
         self.fine_tune.value = bytes.next() >> 3
 
@@ -593,8 +593,8 @@ class Miscellaneous(ParameterCollection):
         self.split_layer_flag = Boolean()
         self.split_layer_program = Parameter(0, 39)
 
-    def to_bytearray(self):
-        """Pack the class's attributes into a bytearray."""
+    def serialize(self):
+        """Serialize the class's attributes into a bytearray."""
         bytes = bytearray()
 
         am = (self.am.value & 0b00000001) << 7
@@ -643,8 +643,8 @@ class Miscellaneous(ParameterCollection):
 
         return bytes
 
-    def from_bytearray(self, bytes):
-        """Unpack the bytearray into the class's attributes."""
+    def deserialize(self, bytes):
+        """Deserialize the bytearray into the class's attributes."""
         byte = bytes.next()
 
         self.am.value = (byte & 0b10000000) >> 7
@@ -752,39 +752,39 @@ class ESQ1Patch(ParameterCollection):
 
         return bytearray([ord(c) for c in name_cleaned.upper()])
 
-    def to_bytearray(self):
-        """Pack the class's attributes into a bytearray."""
+    def serialize(self):
+        """Serialize the class's attributes into a bytearray."""
         bytes = self.clean_name()
 
         for envelope in self.envelopes:
-            bytes += envelope.to_bytearray()
+            bytes += envelope.serialize()
 
         for lfo in self.lfos:
-            bytes += lfo.to_bytearray()
+            bytes += lfo.serialize()
 
         for oscillator in self.oscillators:
-            bytes += oscillator.to_bytearray()
+            bytes += oscillator.serialize()
 
-        bytes += self.miscellaneous.to_bytearray()
+        bytes += self.miscellaneous.serialize()
 
         return bytes
 
-    def from_bytearray(self, bytes):
-        """Unpack the bytearray into the class's attributes."""
+    def deserialize(self, bytes):
+        """Deserialize the bytearray into the class's attributes."""
         name = [chr(bytes.next()) for i in range(self.NAME_LENGTH)]
 
         self.name = "".join(name)
 
         for envelope in self.envelopes:
-            envelope.from_bytearray(bytes)
+            envelope.deserialize(bytes)
 
         for lfo in self.lfos:
-            lfo.from_bytearray(bytes)
+            lfo.deserialize(bytes)
 
         for oscillator in self.oscillators:
-            oscillator.from_bytearray(bytes)
+            oscillator.deserialize(bytes)
 
-        self.miscellaneous.from_bytearray(bytes)
+        self.miscellaneous.deserialize(bytes)
 
 
 def sysex_to_esq1_patches(filename):
@@ -833,7 +833,7 @@ def sysex_to_esq1_patches(filename):
         patch = ESQ1Patch()
         patches.append(patch)
 
-        patch.from_bytearray(unpacker)
+        patch.deserialize(unpacker)
 
     # ensure the end of the SYSEX file has been reached.
     assert sysex.next() == 0xF7
@@ -875,7 +875,7 @@ def esq1_patches_to_sysex(patches, filename, channel=0):
 
     # if there are more than 40 patches, ignore them.
     for patch in patches[:40]:
-        for bytes in patch.to_bytearray():
+        for bytes in patch.serialize():
             # append last four bits...
             result.append(bytes & 0b00001111)
             # ...then first four bits.

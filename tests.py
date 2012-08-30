@@ -51,9 +51,9 @@ class TestParity(object):
         for i in range(5):
             original.randomize()
 
-            original_bytes = iter(original.to_bytearray())
+            original_bytes = iter(original.serialize())
             new = self.cls()
-            new.from_bytearray(original_bytes)
+            new.deserialize(original_bytes)
 
             self.assertEqual(original, new)
 
