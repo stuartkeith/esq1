@@ -248,14 +248,14 @@ class Envelope(ParameterCollection):
     def deserialize(self, bytes):
         """Deserialize the bytearray into the class's attributes."""
         for level in self.levels:
-            level.value = pcb_to_display(bytes.next() >> 1)
+            level.value = pcb_to_display(next(bytes) >> 1)
 
         for time in self.times:
-            time.value = bytes.next()
+            time.value = next(bytes)
 
-        self.velocity_level.value = bytes.next() >> 2
-        self.velocity_attack_control.value = bytes.next()
-        self.keyboard_decay_scaling.value = bytes.next()
+        self.velocity_level.value = next(bytes) >> 2
+        self.velocity_attack_control.value = next(bytes)
+        self.keyboard_decay_scaling.value = next(bytes)
 
 
 class LFO(ParameterCollection):
@@ -317,17 +317,17 @@ class LFO(ParameterCollection):
 
     def deserialize(self, bytes):
         """Deserialize the bytearray into the class's attributes."""
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.waveform.value = (byte & 0b11000000) >> 6
         self.frequency.value = byte & 0b00111111
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         modulation_source_0 = (byte & 0b11000000) >> 6
         self.levels[0].value = byte & 0b00111111
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         modulation_source_1 = (byte & 0b11000000) >> 6
         self.levels[1].value = byte & 0b00111111
@@ -335,7 +335,7 @@ class LFO(ParameterCollection):
         self.modulation_source.value = modulation_source_0 +\
             (modulation_source_1 << 2)
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.reset.value = (byte & 0b10000000) >> 7
         self.humanize.value = (byte & 0b01000000) >> 6
@@ -468,36 +468,36 @@ class Oscillator(ParameterCollection):
 
     def deserialize(self, bytes):
         """Deserialize the bytearray into the class's attributes."""
-        self.semitone.value = bytes.next()
-        self.fine_tune.value = bytes.next() >> 3
+        self.semitone.value = next(bytes)
+        self.fine_tune.value = next(bytes) >> 3
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.frequency_modulation_sources[1].value = byte >> 4
         self.frequency_modulation_sources[0].value = byte & 0b00001111
 
         self.frequency_modulation_amounts[0].value = pcb_to_display(
-            bytes.next() >> 1)
+            next(bytes) >> 1)
 
         self.frequency_modulation_amounts[1].value = pcb_to_display(
-            bytes.next() >> 1)
+            next(bytes) >> 1)
 
-        self.waveform.value = bytes.next()
+        self.waveform.value = next(bytes)
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.dca_enable.value = (byte & 0b10000000) >> 7
         self.dca_level.value = (byte & 0b01111111) >> 1
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.dca_modulation_sources[1].value = byte >> 4
         self.dca_modulation_sources[0].value = byte & 0b00001111
 
         self.dca_modulation_amounts[0].value = pcb_to_display(
-            bytes.next() >> 1)
+            next(bytes) >> 1)
         self.dca_modulation_amounts[1].value = pcb_to_display(
-            bytes.next() >> 1)
+            next(bytes) >> 1)
 
 
 class Miscellaneous(ParameterCollection):
@@ -645,71 +645,71 @@ class Miscellaneous(ParameterCollection):
 
     def deserialize(self, bytes):
         """Deserialize the bytearray into the class's attributes."""
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.am.value = (byte & 0b10000000) >> 7
         self.dca4_modulation_amount.value = (byte & 0b01111111) >> 1
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.sync.value = (byte & 0b10000000) >> 7
         self.frequency.value = byte & 0b01111111
 
-        self.resonance.value = bytes.next()
+        self.resonance.value = next(bytes)
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.filter_modulation_sources[0].value = byte & 0b00001111
         self.filter_modulation_sources[1].value = byte >> 4
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.reset_voice.value = (byte & 0b10000000) >> 7
         self.filter_modulation_amount[0].value = pcb_to_display(
             byte & 0b01111111)
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.mono.value = (byte & 0b10000000) >> 7
         self.filter_modulation_amount[1].value = pcb_to_display(
             byte & 0b01111111)
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.reset_envelope.value = (byte & 0b10000000) >> 7
         self.filter_keyboard_tracking.value = (byte & 0b01111111) >> 1
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.reset_oscillator.value = (byte & 0b10000000) >> 7
         self.glide.value = byte & 0b01111111
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.split_direction.value = (byte & 0b10000000) >> 7
         self.split_point.value = byte & 0b01111111
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.layer_flag.value = (byte & 0b10000000) >> 7
         self.layer_program.value = byte & 0b01111111
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.split_flag.value = (byte & 0b10000000) >> 7
         self.split_program.value = byte & 0b01111111
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.split_layer_flag.value = (byte & 0b10000000) >> 7
         self.split_layer_program.value = byte & 0b01111111
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.pan.value = (byte & 0b11110000) >> 4
         self.pan_modulation_source.value = byte & 0b00001111
 
-        byte = bytes.next()
+        byte = next(bytes)
 
         self.cycle.value = (byte & 0b10000000) >> 7
         self.pan_modulation_amount.value = pcb_to_display(byte & 0b01111111)
@@ -771,7 +771,7 @@ class ESQ1Patch(ParameterCollection):
 
     def deserialize(self, bytes):
         """Deserialize the bytearray into the class's attributes."""
-        name = [chr(bytes.next()) for i in range(self.NAME_LENGTH)]
+        name = [chr(next(bytes)) for i in range(self.NAME_LENGTH)]
 
         self.name = "".join(name)
 
@@ -798,14 +798,14 @@ def sysex_to_esq1_patches(filename):
         sysex = iter(bytearray(sysex_file.read()))
 
     # SYSEX, Ensoniq ID, ESQ-1 ID.
-    assert sysex.next() == 0xF0
-    assert sysex.next() == 0x0F
-    assert sysex.next() == 0x02
+    assert next(sysex) == 0xF0
+    assert next(sysex) == 0x0F
+    assert next(sysex) == 0x02
 
     # the channel is not used.
-    channel = sysex.next()
+    channel = next(sysex)
 
-    dump_type = sysex.next()
+    dump_type = next(sysex)
 
     if dump_type == 0x01:
         # single program format.
@@ -821,8 +821,8 @@ def sysex_to_esq1_patches(filename):
     # use a generator to combine the two bytes into one.
     def _unpacker(sysex):
         while True:
-            low = sysex.next()
-            high = sysex.next()
+            low = next(sysex)
+            high = next(sysex)
 
             yield low + (high << 4)
 
@@ -836,7 +836,7 @@ def sysex_to_esq1_patches(filename):
         patch.deserialize(unpacker)
 
     # ensure the end of the SYSEX file has been reached.
-    assert sysex.next() == 0xF7
+    assert next(sysex) == 0xF7
 
     return patches
 
@@ -846,7 +846,7 @@ def esq1_patches_to_sysex(patches, filename, channel=0):
 
     If list contains one patch, the SYSEX file will be in the 'single program
     dump' format.
-    
+
     Otherwise it will be in the 'all program dump' format. If the list contains
     fewer than 40 patches, it will be padded with blank patches. If the list
     contains more than 40 patches, only the first 40 will be saved.
