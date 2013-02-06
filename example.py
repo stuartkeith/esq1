@@ -11,8 +11,8 @@ tribel = sysex_to_esq1_patches('tribel.syx')
 
 # this file is in 'single program dump' format, so the list will only have one
 # patch.
-print '"tribel.syx" contains %d patch(es).' % len(tribel)
-print 'the first patch is named "%s".' % tribel[0].name
+print('"tribel.syx" contains %d patch(es).' % len(tribel))
+print('the first patch is named "%s".' % tribel[0].name)
 
 # create a simple patch...
 patch = simple_patch()
@@ -64,4 +64,4 @@ esq1_patches_to_sysex([patch], 'saved.syx')
 read_patches = sysex_to_esq1_patches('saved.syx')
 
 # the truncated, uppercase name will be shown.
-print 'read patch "%s".' % read_patches[0].name
+print('read patch "%s".' % read_patches[0].name)
