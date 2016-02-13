@@ -309,8 +309,8 @@ class LFO(ParameterCollection):
         humanize = (self.humanize.value & 0b00000001) << 6
 
         bytes.append(waveform + self.frequency.value)
-        bytes.append(modulation_source_0 + self.levels[0].value)
-        bytes.append(modulation_source_1 + self.levels[1].value)
+        bytes.append(modulation_source_1 + self.levels[0].value)
+        bytes.append(modulation_source_0 + self.levels[1].value)
         bytes.append(reset + humanize + self.delay.value)
 
         return bytes
@@ -332,8 +332,8 @@ class LFO(ParameterCollection):
         modulation_source_1 = (byte & 0b11000000) >> 6
         self.levels[1].value = byte & 0b00111111
 
-        self.modulation_source.value = modulation_source_0 +\
-            (modulation_source_1 << 2)
+        self.modulation_source.value = modulation_source_1 +\
+            (modulation_source_0 << 2)
 
         byte = next(bytes)
 
